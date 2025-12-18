@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Mobile App</title>
+    <style>
+        /* --- 基本設定 --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            /* 上下の固定バーに被らないように余白を作る */
+            padding-top: 60px;
+            padding-bottom: 70px;
+        }
+
+        /* --- ヘッダー（上部固定） --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* --- メインコンテンツ --- */
+        main {
+            padding: 20px;
+            max-width: 500px; /* PCで見た時に広がりすぎないように制限 */
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #f4f3d3;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            /* box-shadow: 0 2px 8px rgba(0,0,0,0.05); */
+        }
+
+        /* --- タブバー（下部固定メニュー） --- */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 70px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #ddd;
+            z-index: 1000;
+        }
+
+        .tab-item {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #666;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .tab-item i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+        }
+
+        .active {
+            color: #007AFF; /* iPhone風のブルー */
+        }
+
+        /* フォーム要素のスマホ最適化 */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #e8e9eb;
+            color: rgb(14, 14, 14);
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:active {
+            opacity: 0.7; /* タップした時に反応を出す */
+        }
+
+        h3{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AI相談アプリ～Hanaso～</h1>
+    </header>
+
+    <main>
+        <div class="card">
+            <h3>
+            <p>新しいアカウントを作成</p>
+            </h3>
+        </div>
+
+        <br>
+
+        <div class="card" style="height: 80px;">
+            <p>ユーザ名</p>
+            <input type="text" class="form-input" placeholder="例：hanaso123" required>
+        </div>
+
+        <div class="card" style="height: 80px;">
+            <p>メールアドレス</p>
+            <input type="email" class="form-input" placeholder="example@mail.com" required>
+        </div>
+
+        <div class="card" style="height: 80px;">
+            <p>パスワード</p>
+            <input type="password" class="form-input" placeholder="8文字以上の英数字" required>
+        </div>
+
+        <div class="card" style="height: 120px;">
+            <p>あなたの興味・関心</p>
+            <textarea class="form-input" rows="3" placeholder="例：旅行、料理、スポーツなど"></textarea>
+        </div>
+
+        <div>
+            <button type="button">作成する</button>
+        </div>
+
+    </main>
+
+    <script>
+        if (botton.click) {
+            alert("アカウントが作成されました！");
+            //アカウント作成後、ログイン画面に遷移
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <!-- <nav class="tab-bar">
+        <a href="#" class="tab-item active">🏠<br>ホーム</a>
+        <a href="#" class="tab-item">🔍<br>探す</a>
+        <a href="#" class="tab-item">🔔<br>通知</a>
+        <a href="#" class="tab-item">👤<br>設定</a>
+    </nav> -->
+
+</body>
+</html>
