@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI相談アプリ～Hanaso～</title>
+    <style>
+        /* --- 基本レイアウト --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            background-color: #fefae0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 375px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- ヘッダー領域 --- */
+        .header-area {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        h1 { 
+            font-size: 22px; 
+            color: #3e1f0b; 
+            margin: 0; 
+        }
+
+        /* --- メインコンテンツ枠（共通） --- */
+        .main-card {
+            background-color: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            scrollbar-width: none;
+            margin-top: 20px;
+        }
+        .main-card::-webkit-scrollbar { display: none; }
+
+        /* --- トーク履歴リスト --- */
+        .talk-list {
+            padding: 20px 0;
+        }
+
+        .talk-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .talk-item:active {
+            background-color: #f9f9f9;
+        }
+
+        .talk-item:last-child {
+            border-bottom: none;
+        }
+
+        .talk-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 2px solid #f0f0f0;
+        }
+
+        .talk-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .talk-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .talk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .talk-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #3e1f0b;
+        }
+
+        .talk-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .talk-preview {
+            font-size: 14px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .talk-badge {
+            background-color: #3e1f0b;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="header-area">
+            <h1>トーク</h1>
+        </div>
+
+        <div class="main-card">
+            <div class="talk-list" id="talk-list">
+                <!-- トーク履歴がここに動的に追加されます -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // キャラクター一覧（select.htmlから取得可能な形式）
+        const characters = [
+            { name: "くま", img: "kuma.png" },
+            { name: "おじいさん", img: "oji.jpeg" },
+            { name: "おばあさん", img: "oba.jpg" },
+            { name: "先輩（男）", img: "man.png" },
+            { name: "先輩（女）", img: "woman.png" },
+            { name: "ホスト", img: "host.png" },
+            { name: "INTJ", img: "INTJ.png" },
+            { name: "INTP", img: "INTP.png" },
+            { name: "ENTJ", img: "ENTJ.png" },
+            { name: "ENTP", img: "ENTP.png" },
+            { name: "INFJ", img: "INFJ.png" },
+            { name: "INFP", img: "INFP.png" },
+            { name: "ENFJ", img: "ENFJ.png" },
+            { name: "ENFP", img: "ENFP.png" },
+            { name: "ISTJ", img: "ISTJ.png" },
+            { name: "ISFJ", img: "ISFJ.png" },
+            { name: "ESTJ", img: "ESTJ.png" },
+            { name: "ESFJ", img: "host.png" },
+            { name: "ISTP", img: "ISTP.png" },
+            { name: "ESTP", img: "ESTP.png" },
+            { name: "ESFP", img: "ESFP.png" }
+        ];
+
+        // トーク履歴を管理する関数
+        function getTalkHistory() {
+            const history = localStorage.getItem('talkHistory');
+            return history ? JSON.parse(history) : [];
+        }
+
+        function saveTalkHistory(history) {
+            localStorage.setItem('talkHistory', JSON.stringify(history));
+        }
+
+        function addTalkToHistory(characterData) {
+            const history = getTalkHistory();
+            const existingIndex = history.findIndex(talk => talk.name === characterData.name);
+            
+            // 画像パスを取得（相対パスまたはファイル名のみ）
+            let imgPath = characterData.imgSrc;
+            if (imgPath.includes('/')) {
+                imgPath = imgPath.split('/').pop();
+            }
+            
+            const talkData = {
+                name: characterData.name,
+                img: imgPath,
+                lastMessage: "相談を開始しました",
+                timestamp: new Date().toISOString(),
+                unread: existingIndex === -1 ? 1 : (history[existingIndex].unread || 0) + 1
+            };
+
+            if (existingIndex !== -1) {
+                // 既存のトークを更新して先頭に移動
+                const existingTalk = history[existingIndex];
+                existingTalk.lastMessage = talkData.lastMessage;
+                existingTalk.timestamp = talkData.timestamp;
+                existingTalk.unread = talkData.unread;
+                history.splice(existingIndex, 1);
+                history.unshift(existingTalk);
+            } else {
+                // 新しいトークを追加
+                history.unshift(talkData);
+            }
+
+            saveTalkHistory(history);
+            renderTalkList();
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return "たった今";
+            if (minutes < 60) return `${minutes}分前`;
+            if (hours < 24) return `${hours}時間前`;
+            if (days < 7) return `${days}日前`;
+            return date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+        }
+
+        function renderTalkList() {
+            const talkList = document.getElementById('talk-list');
+            const history = getTalkHistory();
+
+            if (history.length === 0) {
+                talkList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-text">まだトーク履歴がありません<br>キャラクターを選択して相談を始めましょう</div>
+                    </div>
+                `;
+                return;
+            }
+
+            talkList.innerHTML = history.map(talk => {
+                const unreadBadge = talk.unread > 0 ? `<span class="talk-badge">${talk.unread}</span>` : '';
+                return `
+                    <a href="#" class="talk-item" data-name="${talk.name}">
+                        <div class="talk-avatar">
+                            <img src="${talk.img}" alt="${talk.name}">
+                        </div>
+                        <div class="talk-content">
+                            <div class="talk-header">
+                                <span class="talk-name">${talk.name}</span>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="talk-time">${formatTime(talk.timestamp)}</span>
+                                    ${unreadBadge}
+                                </div>
+                            </div>
+                            <div class="talk-preview">
+                                ${talk.lastMessage}
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+
+            // クリックイベントを追加
+            document.querySelectorAll('.talk-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const characterName = this.getAttribute('data-name');
+                    const history = getTalkHistory();
+                    const talkData = history.find(talk => talk.name === characterName);
+                    
+                    if (talkData) {
+                        // キャラクター情報をlocalStorageに保存してchat.htmlに遷移
+                        const characterData = {
+                            name: talkData.name,
+                            imgSrc: talkData.img,
+                            intro: '' // 必要に応じて追加
+                        };
+                        localStorage.setItem('currentChatCharacter', JSON.stringify(characterData));
+                        
+                        // 未読数をリセット
+                        talkData.unread = 0;
+                        saveTalkHistory(history);
+                        
+                        // chat.htmlに遷移
+                        window.location.href = 'chat.html';
+                    }
+                });
+            });
+        }
+
+        // ページ読み込み時に実行
+        window.addEventListener('DOMContentLoaded', function() {
+            // 選択されたキャラクター情報を確認
+            const selectedCharacter = localStorage.getItem('selectedCharacter');
+            if (selectedCharacter) {
+                const characterData = JSON.parse(selectedCharacter);
+                addTalkToHistory(characterData);
+                // 使用後は削除
+                localStorage.removeItem('selectedCharacter');
+            } else {
+                renderTalkList();
+            }
+        });
+    </script>
+
+</body>
+</html>
+
