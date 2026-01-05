@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>お悩み相談キャラ選択アプリ</title>
+    <title>AI相談アプリ～Hanaso～</title>
     <style>
         /* --- 基本レイアウト --- */
         body {
@@ -291,7 +291,7 @@
                 </div>
             </div>
             <div class="footer-action">
-                <button class="btn" onclick="alert('相談チャットを開始します！')">君に決めた</button>
+                <button class="btn" onclick="goToTalk()">君に決めた</button>
             </div>
         </div>
     </div>
@@ -305,6 +305,8 @@
         const randomBtn = document.getElementById('random-btn');
         const scrollGrid = document.getElementById('scroll-grid');
 
+        let selectedCharacterData = null;
+
         function selectCharacter(element) {
             const imgSrc = element.querySelector('.icon img').src;
             const name = element.getAttribute('data-name');
@@ -312,8 +314,17 @@
             selectedIconImg.src = imgSrc;
             profileName.innerText = name;
             profileIntroText.innerText = intro;
+            selectedCharacterData = { imgSrc, name, intro };
             selectionPage.classList.remove('active');
             profilePage.classList.add('active');
+        }
+
+        function goToTalk() {
+            if (selectedCharacterData) {
+                // 選択されたキャラクター情報をlocalStorageに保存
+                localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacterData));
+                window.location.href = 'talk.html';
+            }
         }
 
         function showSelection() {
