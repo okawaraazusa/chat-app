@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お悩み相談キャラ選択アプリ</title>
+    <style>
+        /* --- 基本レイアウト --- */
+        body {
+            margin: 0;
+            background-color: #fefae0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 375px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .page { 
+            display: none; 
+            flex-direction: column;
+            height: 100%;
+        }
+        .page.active { display: flex; }
+
+        /* --- ヘッダー領域 --- */
+        .header-area {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        h1 { font-size: 22px; color: #3e1f0b; margin: 0; }
+
+        .back-nav {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .back-btn { background: none; border: none; font-size: 16px; color: #3e1f0b; font-weight: bold; cursor: pointer; }
+
+        /* --- メインコンテンツ枠（共通） --- */
+        .main-card {
+            background-color: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .main-card::-webkit-scrollbar { display: none; }
+
+        /* 選択画面のグリッド */
+        .selection-grid {
+            padding: 70px 15px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px 15px;
+        }
+
+        /* --- キャラクター項目 --- */
+        .char-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* 吹き出し */
+        .bubble {
+            position: absolute;
+            top: -45px; right: -10px; z-index: 2;
+            width: 85px; height: 50px;
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none;
+        }
+        .bubble img { position: absolute; width: 100%; height: 100%; z-index: 1; }
+        .bubble-text {
+            position: relative; z-index: 2; font-size: 10px; font-weight: bold;
+            color: #3e1f0b; text-align: center; padding-bottom: 10px; line-height: 1.2;
+        }
+
+        /* アイコン */
+        .icon {
+            width: 100px; height: 100px; background-color: #f0f0f0;
+            border-radius: 50%; overflow: hidden; border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
+        }
+        .char-item.highlight .icon { transform: scale(1.1); box-shadow: 0 0 20px #ffeb3b; border: 3px solid #ffeb3b; }
+        .icon img { width: 100%; height: 100%; object-fit: cover; }
+        .char-name-label { margin-top: 12px; font-size: 12px; color: #5d4037; font-weight: bold; }
+
+        /* --- プロフィール専用レイアウト --- */
+        .profile-page-card {
+            overflow: visible; /* アイコンの飛び出しを許可 */
+            margin-top: 50px; /* 選択画面と枠の下端を合わせるためのマージン */
+        }
+        .profile-content {
+            padding: 80px 25px 40px;
+            text-align: center;
+        }
+        .profile-icon-wrap {
+            position: absolute;
+            top: -55px; left: 50%; transform: translateX(-50%);
+            width: 110px; height: 110px;
+            border-radius: 50%; overflow: hidden;
+            border: 6px solid #fefae0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .profile-icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        h2#profile-name { font-size: 26px; color: #3e1f0b; margin: 10px 0; }
+        .intro-text { color: #444; line-height: 1.8; margin-top: 20px; white-space: pre-wrap; text-align: left; font-size: 15px;}
+
+        /* --- ボタン --- */
+        .footer-action { height: 100px; display: flex; align-items: center; flex-shrink: 0; }
+        .btn {
+            background-color: #3e1f0b; color: #ffffff; border: none;
+            padding: 18px 0; width: 100%; border-radius: 25px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(62, 31, 11, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background-color: #ccc; box-shadow: none; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div id="selection-page" class="page active">
+            <div class="header-area"><h1>誰に相談する？</h1></div>
+            <div class="main-card" id="scroll-grid">
+                <div class="selection-grid">
+                    
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="くま" data-intro="ぼーっと空を眺めるのが日課だよ。たまに自分がクマなのかトリなのか分からなくなるけど、美味しい木の実があればそれで幸せ！">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">ゆっくり<br>聞くよ。</div></div>
+                        <div class="icon"><img src="kuma.png"></div>
+                        <div class="char-name-label">くま</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="おじいさん" data-intro="盆栽を愛でて50年。若いもんには、まだまだ知恵で負けませんぞ。焦らんでええ、ゆっくり話そうな。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">焦らんで<br>ええぞ。</div></div>
+                        <div class="icon"><img src="oji.jpeg"></div>
+                        <div class="char-name-label">おじいさん</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="おばあさん" data-intro="秘伝のタレで作る肉じゃがが自慢ですよ。ほころびも直してあげますから、一人で悩まないでね。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">一人で<br>悩まないで</div></div>
+                        <div class="icon"><img src="oba.jpg"></div>
+                        <div class="char-name-label">おばあさん</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="先輩（男）" data-intro="仕事はスマートに、遊びは全力で、がモットーだ。君の力になりたいんだ。何でも言って。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">力に<br>なるよ。</div></div>
+                        <div class="icon"><img src="man.png"></div>
+                        <div class="char-name-label">先輩（男）</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="先輩（女）" data-intro="毎日忙しいけど、お気に入りのカフェでリセット。たまには肩の力を抜いて、私とゆっくりお喋りしましょう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">本音、<br>聞かせて？</div></div>
+                        <div class="icon"><img src="woman.png"></div>
+                        <div class="char-name-label">先輩（女）</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ホスト" data-intro="孤独な夜はもう終わりだ。世界中で君一人だけを、最高のお姫様にしてあげる。さあ、僕の手を取って。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">君の<br>味方だよ。</div></div>
+                        <div class="icon"><img src="host.png"></div>
+                        <div class="char-name-label">ホスト</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="INTJ（建築家）" data-intro="全ては計画通りです。無駄を省き、最も効率的な道筋を導き出しました。私と一緒に解決策を考えましょう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">解決策は<br>あります</div></div>
+                        <div class="icon"><img src="INTJ.png"></div>
+                        <div class="char-name-label">INTJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="INTP（論理学者）" data-intro="興味深い理論ですね。その仕組みについて詳しく解析させてください。本質を突いた対話をしましょう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">本質を<br>探ろうか。</div></div>
+                        <div class="icon"><img src="INTP.png"></div>
+                        <div class="char-name-label">INTP</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ENTJ（指揮官）" data-intro="目標達成のための戦略は完璧だ。私についてくれば最高の結果を約束しよう。私が進むべき道を導こう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">私が<br>導こう。</div></div>
+                        <div class="icon"><img src="ENTJ.png"></div>
+                        <div class="char-name-label">ENTJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ENTP（討論者）" data-intro="それって本当に正しいのかな？別の視点から考えてみようよ。面白いアイデアならいくらでもあるぜ！">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">視点を<br>変えようぜ</div></div>
+                        <div class="icon"><img src="ENTP.png"></div>
+                        <div class="char-name-label">ENTP</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="INFJ（提唱者）" data-intro="あなたの心の奥にある本当の願い、私には分かります。静かな場所で、理想の世界について語り合いましょう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">心の声を<br>聴かせて</div></div>
+                        <div class="icon"><img src="INFJ.png"></div>
+                        <div class="char-name-label">INFJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="INFP（仲介者）" data-intro="夢や空想の中にいる時間が一番落ち着くんです。言葉にできないその想い、私と一緒に探してみませんか？">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">そのままで<br>いいよ</div></div>
+                        <div class="icon"><img src="INFP.png"></div>
+                        <div class="char-name-label">INFP</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ENFJ（主人公）" data-intro="みんなが笑顔になれる場所を作りたいんだ！君の悩みも全部聞かせて。最高の明日を迎えに行こう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">一緒に<br>考えよう！</div></div>
+                        <div class="icon"><img src="ENFJ.png"></div>
+                        <div class="char-name-label">ENFJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ENFP（運動家）" data-intro="ワクワクすることが止まらないよ！人生は一度きりの冒険だ。君の可能性、一緒に探そう！">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">可能性、<br>探そう！</div></div>
+                        <div class="icon"><img src="ENFP.png"></div>
+                        <div class="char-name-label">ENFP</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ISTJ（管理者）" data-intro="規律を重んじ、責任を全うすることが私の信条です。現実的な視点から誠実な歩みを約束します。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">現実的に<br>見よう。</div></div>
+                        <div class="icon"><img src="ISTJ.png"></div>
+                        <div class="char-name-label">ISTJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ISFJ（擁護者）" data-intro="いつも頑張っているあなたを、影ながら支えさせてください。困った時は温かいお茶を淹れて待っています。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">ずっと<br>支えます。</div></div>
+                        <div class="icon"><img src="ISFJ.png"></div>
+                        <div class="char-name-label">ISFJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ESTJ（幹部）" data-intro="社会のルールを守り、秩序を維持するのが私の役目だ。君の状況を整理し、管理してあげよう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">整理しま<br>しょう。</div></div>
+                        <div class="icon"><img src="ESTJ.png"></div>
+                        <div class="char-name-label">ESTJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ESFJ（領事官）" data-intro="みんなの輪を大切にするのが私の幸せなの。私に話してみて！何か手伝えることがあれば言ってね。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">私に<br>話してみて！</div></div>
+                        <div class="icon"><img src="host.png"></div> <div class="char-name-label">ESFJ</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ISTP（巨匠）" data-intro="理屈より実践だ。この道具さえあれば大抵のものは直せる。無駄を省き、自分のペースでやっていこう。">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">無駄は<br>省こう。</div></div>
+                        <div class="icon"><img src="ISTP.png"></div>
+                        <div class="char-name-label">ISTP</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ESTP（起業家）" data-intro="考える前に動け！スリルがなきゃ人生じゃないだろ。今この瞬間を最高に楽しもうぜ！悩むより動こう！">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">悩むより<br>動こう！</div></div>
+                        <div class="icon"><img src="ESTP.png"></div>
+                        <div class="char-name-label">ESTP</div>
+                    </div>
+
+                    <div class="char-item" onclick="selectCharacter(this)" data-name="ESFP（エンターテイナー）" data-intro="音楽とダンス！私がいればいつだってパーティーだよ。嫌なことなんて笑い飛ばそうぜ！">
+                        <div class="bubble"><img src="hukidasi.png"><div class="bubble-text">笑い飛ば<br>そうぜ！</div></div>
+                        <div class="icon"><img src="ESFP.png"></div>
+                        <div class="char-name-label">ESFP</div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="footer-action">
+                <button id="random-btn" class="btn" onclick="randomSelectAnimation()">ランダム選択</button>
+            </div>
+        </div>
+
+        <div id="profile-page" class="page">
+            <div class="back-nav"><button class="back-btn" onclick="showSelection()">← 他のキャラを見る</button></div>
+            <div class="main-card profile-page-card">
+                <div class="profile-icon-wrap">
+                    <img id="selected-icon" src="" alt="">
+                </div>
+                <div class="profile-content">
+                    <h2 id="profile-name"></h2>
+                    <p id="profile-intro" class="intro-text"></p>
+                </div>
+            </div>
+            <div class="footer-action">
+                <button class="btn" onclick="alert('相談チャットを開始します！')">君に決めた</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const selectionPage = document.getElementById('selection-page');
+        const profilePage = document.getElementById('profile-page');
+        const selectedIconImg = document.getElementById('selected-icon');
+        const profileName = document.getElementById('profile-name');
+        const profileIntroText = document.getElementById('profile-intro');
+        const randomBtn = document.getElementById('random-btn');
+        const scrollGrid = document.getElementById('scroll-grid');
+
+        function selectCharacter(element) {
+            const imgSrc = element.querySelector('.icon img').src;
+            const name = element.getAttribute('data-name');
+            const intro = element.getAttribute('data-intro');
+            selectedIconImg.src = imgSrc;
+            profileName.innerText = name;
+            profileIntroText.innerText = intro;
+            selectionPage.classList.remove('active');
+            profilePage.classList.add('active');
+        }
+
+        function showSelection() {
+            profilePage.classList.remove('active');
+            selectionPage.classList.add('active');
+        }
+
+        function randomSelectAnimation() {
+            const characters = document.querySelectorAll('.char-item');
+            if (characters.length === 0) return;
+            randomBtn.disabled = true;
+            let count = 0;
+            const totalSteps = 25;
+            let speed = 70;
+
+            const interval = setInterval(() => {
+                characters.forEach(c => c.classList.remove('highlight'));
+                const currentIndex = count % characters.length;
+                const activeItem = characters[currentIndex];
+                activeItem.classList.add('highlight');
+                
+                // 枠内でのスクロール追従
+                activeItem.scrollIntoView({ behavior: 'auto', block: 'center' });
+
+                count++;
+                if (count >= totalSteps) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        activeItem.classList.remove('highlight');
+                        randomBtn.disabled = false;
+                        selectCharacter(activeItem);
+                    }, 400);
+                }
+            }, speed);
+        }
+    </script>
+</body>
+</html>
