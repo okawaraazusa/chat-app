@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI相談アプリ～Hanaso～</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        /* --- 基本レイアウト --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            background-color: #fefae0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 375px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* --- ヘッダー領域 --- */
+        .chat-header {
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #3e1f0b;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 5px;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+            border: 2px solid #f0f0f0;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3e1f0b;
+        }
+
+        /* --- メッセージエリア --- */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 15px;
+            background-color: #fefae0;
+            scrollbar-width: none;
+        }
+        .chat-messages::-webkit-scrollbar { display: none; }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.character {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background-color: #3e1f0b;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.character .message-content {
+            background-color: #ffffff;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .message.user .message-time {
+            text-align: right;
+        }
+
+        .message.character .message-time {
+            text-align: left;
+        }
+
+        .character-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 8px;
+            flex-shrink: 0;
+            border: 2px solid #f0f0f0;
+        }
+
+        .character-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empty-chat {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-chat-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .empty-chat-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* --- 入力エリア --- */
+        .chat-input-area {
+            background-color: #ffffff;
+            padding: 10px 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #f0f0f0;
+            border-radius: 20px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #3e1f0b;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3e1f0b;
+            color: #ffffff;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        .send-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading-indicator {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+            padding: 0 15px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 5px;
+            padding: 12px 16px;
+            background-color: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #999;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes loading {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <!-- ヘッダー -->
+        <div class="chat-header">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="header-info">
+                <div class="header-avatar">
+                    <img id="character-avatar" src="" alt="">
+                </div>
+                <div class="header-name" id="character-name"></div>
+            </div>
+        </div>
+
+        <!-- メッセージエリア -->
+        <div class="chat-messages" id="chat-messages">
+            <!-- メッセージがここに動的に追加されます -->
+        </div>
+
+        <!-- 入力エリア -->
+        <div class="chat-input-area">
+            <textarea 
+                class="input-field" 
+                id="message-input" 
+                placeholder="メッセージを入力..."
+                rows="1"
+                onkeydown="handleKeyDown(event)"
+            ></textarea>
+            <button class="send-button" id="send-button" onclick="sendMessage()">→</button>
+        </div>
+    </div>
+
+    <script>
+        let currentCharacter = null;
+        let chatMessages = [];
+
+        // ページ読み込み時に実行
+        window.addEventListener('DOMContentLoaded', function() {
+            // キャラクター情報を取得
+            const characterData = localStorage.getItem('currentChatCharacter');
+            if (characterData) {
+                currentCharacter = JSON.parse(characterData);
+                document.getElementById('character-name').textContent = currentCharacter.name;
+                document.getElementById('character-avatar').src = currentCharacter.imgSrc;
+                
+                // チャット履歴を読み込み
+                loadChatHistory();
+            } else {
+                // キャラクター情報がない場合はtalk.htmlに戻る
+                window.location.href = 'talk.html';
+            }
+        });
+
+        function goBack() {
+            window.location.href = 'talk.html';
+        }
+
+        function loadChatHistory() {
+            // データベースからメッセージを読み込む（将来実装）
+            // 現在はlocalStorageから読み込む
+            const chatKey = `chat_${currentCharacter.name}`;
+            const savedMessages = localStorage.getItem(chatKey);
+            
+            if (savedMessages) {
+                chatMessages = JSON.parse(savedMessages);
+            } else {
+                // 初回メッセージを追加
+                chatMessages = [{
+                    type: 'character',
+                    text: 'こんにちは！相談したいことがあれば、何でも聞いてくださいね。',
+                    timestamp: new Date().toISOString()
+                }];
+                saveChatHistory();
+            }
+            
+            renderMessages();
+        }
+
+        function saveChatHistory() {
+            const chatKey = `chat_${currentCharacter.name}`;
+            localStorage.setItem(chatKey, JSON.stringify(chatMessages));
+            
+            // talk.htmlの履歴も更新
+            updateTalkHistory();
+        }
+
+        function updateTalkHistory() {
+            const talkHistory = JSON.parse(localStorage.getItem('talkHistory') || '[]');
+            const talkIndex = talkHistory.findIndex(talk => talk.name === currentCharacter.name);
+            
+            if (talkIndex !== -1) {
+                const lastMessage = chatMessages[chatMessages.length - 1];
+                talkHistory[talkIndex].lastMessage = lastMessage.text;
+                talkHistory[talkIndex].timestamp = lastMessage.timestamp;
+                localStorage.setItem('talkHistory', JSON.stringify(talkHistory));
+            }
+        }
+
+        function renderMessages() {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            if (chatMessages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="empty-chat">
+                        <div class="empty-chat-icon">💬</div>
+                        <div class="empty-chat-text">メッセージを送信して会話を始めましょう</div>
+                    </div>
+                `;
+                return;
+            }
+
+            messagesContainer.innerHTML = chatMessages.map((msg, index) => {
+                const isUser = msg.type === 'user';
+                const time = formatMessageTime(msg.timestamp);
+                
+                if (isUser) {
+                    return `
+                        <div class="message user">
+                            <div class="message-wrapper">
+                                <div class="message-content">${escapeHtml(msg.text)}</div>
+                                <div class="message-time">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="message character">
+                            <div class="character-avatar">
+                                <img src="${currentCharacter.imgSrc}" alt="${currentCharacter.name}">
+                            </div>
+                            <div class="message-wrapper">
+                                <div class="message-content">${escapeHtml(msg.text)}</div>
+                                <div class="message-time">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            // スクロールを最下部に
+            scrollToBottom();
+        }
+
+        function formatMessageTime(timestamp) {
+            const date = new Date(timestamp);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            // 入力欄と送信ボタンを無効化
+            input.disabled = true;
+            sendButton.disabled = true;
+
+            // ユーザーメッセージを追加
+            chatMessages.push({
+                type: 'user',
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+
+            input.value = '';
+            input.style.height = 'auto';
+            saveChatHistory();
+            renderMessages();
+
+            // ローディング表示を追加
+            showLoadingIndicator();
+
+            // GeminiAPIにリクエストを送信
+            $.ajax({
+                type: 'GET',
+                url: '/send',
+                data: { 
+                    q: text,
+                    character: currentCharacter.name  // キャラクター情報も送信
+                },
+                success: function(answer) {
+                    // ローディング表示を削除
+                    hideLoadingIndicator();
+                    
+                    // キャラクターの返信を追加
+                    chatMessages.push({
+                        type: 'character',
+                        text: answer,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    saveChatHistory();
+                    renderMessages();
+                    
+                    // 入力欄と送信ボタンを再有効化
+                    input.disabled = false;
+                    sendButton.disabled = false;
+                    input.focus();
+                },
+                error: function(xhr, status, error) {
+                    // ローディング表示を削除
+                    hideLoadingIndicator();
+                    
+                    // エラーメッセージを表示
+                    chatMessages.push({
+                        type: 'character',
+                        text: '申し訳ございません。エラーが発生しました。もう一度お試しください。',
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    saveChatHistory();
+                    renderMessages();
+                    
+                    // 入力欄と送信ボタンを再有効化
+                    input.disabled = false;
+                    sendButton.disabled = false;
+                    input.focus();
+                    
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function showLoadingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const loadingHtml = `
+                <div class="loading-indicator">
+                    <div class="character-avatar">
+                        <img src="${currentCharacter.imgSrc}" alt="${currentCharacter.name}">
+                    </div>
+                    <div class="loading-dots">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.insertAdjacentHTML('beforeend', loadingHtml);
+            scrollToBottom();
+        }
+
+        function hideLoadingIndicator() {
+            const loadingIndicator = document.querySelector('.loading-indicator');
+            if (loadingIndicator) {
+                loadingIndicator.remove();
+            }
+        }
+
+        function handleKeyDown(event) {
+            const input = document.getElementById('message-input');
+            
+            // Enterキーで送信（Shift+Enterで改行）
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+            
+            // テキストエリアの高さを自動調整
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
+
