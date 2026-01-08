@@ -25,6 +25,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 import ssl
 import socket
 import urllib
+import re
 
 class MyHandler(SimpleHTTPRequestHandler):
 
@@ -50,7 +51,9 @@ class MyHandler(SimpleHTTPRequestHandler):
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": q}]
             )
-            answer = "<b>" + response.choices[0].message.content + "</b>" #webブラウザに返信するHTML文を作成する
+            answer = response.choices[0].message.content #webブラウザに返信するHTML文を作成する
+            # HTMLタグを削除
+            answer = re.sub(r'<[^>]+>', '', answer)
             print(answer) #consoleに表示
             
             self.wfile.write(answer.encode('utf-8'))#webブラウザに返信する
