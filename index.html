@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI相談アプリ～Hanaso～</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <style>
         /* --- 基本レイアウト --- */
         * {
@@ -31,6 +32,18 @@
             box-sizing: border-box;
         }
 
+        /* --- ページ管理 --- */
+        .page {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 40px);
+        }
+        .page.active {
+            display: flex;
+        }
+
         /* --- ヘッダー領域 --- */
         .header-area {
             height: 60px;
@@ -43,6 +56,23 @@
             font-size: 22px; 
             color: #3e1f0b; 
             margin: 0; 
+        }
+
+        /* --- ログイン用ヘッダー --- */
+        header {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
         /* --- メインコンテンツ枠（共通） --- */
@@ -62,6 +92,28 @@
             justify-content: center;
         }
         .main-card::-webkit-scrollbar { display: none; }
+
+        /* --- ログイン用メイン --- */
+        main {
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: #f4f3d3;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
         /* --- ロゴ --- */
         .logo {
@@ -109,26 +161,1270 @@
         .btn-secondary:active {
             background-color: #fefae0;
         }
+
+        /* --- フォームカード --- */
+        .form-card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .form-card p {
+            color: #3e1f0b;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #333;
+            background-color: #fafafa;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3e1f0b;
+            background-color: #ffffff;
+        }
+
+        .form-input::placeholder {
+            color: #999;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* --- タイトルカード --- */
+        .title-card {
+            background-color: transparent;
+            padding: 25px 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .title-card h3 {
+            color: #3e1f0b;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        /* --- ログイン用ボタン --- */
+        button.login-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button.login-btn:active {
+            opacity: 0.7;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .signup-link a {
+            color: #007AFF;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* --- フッターアクション --- */
+        .footer-action { 
+            height: 100px; 
+            display: flex; 
+            align-items: center; 
+            flex-shrink: 0; 
+            margin-top: 20px;
+        }
+
+        /* --- チャット画面用スタイル --- */
+        .chat-header {
+            height: 60px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #3e1f0b;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 5px;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+            border: 2px solid #f0f0f0;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3e1f0b;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 15px;
+            background-color: #fefae0;
+            scrollbar-width: none;
+        }
+        .chat-messages::-webkit-scrollbar { display: none; }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.character {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background-color: #3e1f0b;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.character .message-content {
+            background-color: #ffffff;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .message.user .message-time {
+            text-align: right;
+        }
+
+        .message.character .message-time {
+            text-align: left;
+        }
+
+        .character-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 8px;
+            flex-shrink: 0;
+            border: 2px solid #f0f0f0;
+        }
+
+        .character-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empty-chat {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-chat-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .empty-chat-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .chat-input-area {
+            background-color: #ffffff;
+            padding: 10px 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #f0f0f0;
+            border-radius: 20px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #3e1f0b;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3e1f0b;
+            color: #ffffff;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        .send-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading-indicator {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+            padding: 0 15px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 5px;
+            padding: 12px 16px;
+            background-color: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #999;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes loading {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* --- 選択画面用スタイル --- */
+        .back-nav {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .back-btn { 
+            background: none; 
+            border: none; 
+            font-size: 16px; 
+            color: #3e1f0b; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+
+        .selection-grid {
+            padding: 70px 15px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px 15px;
+        }
+
+        .char-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .bubble {
+            position: absolute;
+            top: -45px; right: -10px; z-index: 2;
+            width: 85px; height: 50px;
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none;
+        }
+        .bubble img { position: absolute; width: 100%; height: 100%; z-index: 1; }
+        .bubble-text {
+            position: relative; z-index: 2; font-size: 10px; font-weight: bold;
+            color: #3e1f0b; text-align: center; padding-bottom: 10px; line-height: 1.2;
+        }
+
+        .icon {
+            width: 100px; height: 100px; background-color: #f0f0f0;
+            border-radius: 50%; overflow: hidden; border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
+        }
+        .char-item.highlight .icon { transform: scale(1.1); box-shadow: 0 0 20px #ffeb3b; border: 3px solid #ffeb3b; }
+        .icon img { width: 100%; height: 100%; object-fit: cover; }
+        .char-name-label { margin-top: 12px; font-size: 12px; color: #5d4037; font-weight: bold; }
+
+        .profile-page-card {
+            overflow: visible;
+            margin-top: 50px;
+        }
+        .profile-content {
+            padding: 80px 25px 40px;
+            text-align: center;
+        }
+        .profile-icon-wrap {
+            position: absolute;
+            top: -55px; left: 50%; transform: translateX(-50%);
+            width: 110px; height: 110px;
+            border-radius: 50%; overflow: hidden;
+            border: 6px solid #fefae0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .profile-icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        h2#profile-name { font-size: 26px; color: #3e1f0b; margin: 10px 0; }
+        .intro-text { color: #444; line-height: 1.8; margin-top: 20px; white-space: pre-wrap; text-align: left; font-size: 15px;}
+
+        .btn:disabled { background-color: #ccc; box-shadow: none; cursor: not-allowed; }
+
+        /* --- トーク履歴用スタイル --- */
+        .talk-list {
+            padding: 20px 0;
+        }
+
+        .talk-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .talk-item:active {
+            background-color: #f9f9f9;
+        }
+
+        .talk-item:last-child {
+            border-bottom: none;
+        }
+
+        .talk-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 2px solid #f0f0f0;
+        }
+
+        .talk-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .talk-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .talk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .talk-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #3e1f0b;
+        }
+
+        .talk-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .talk-preview {
+            font-size: 14px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .talk-badge {
+            background-color: #3e1f0b;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* --- チャット画面用コンテナ --- */
+        .chat-page-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
 
     <div class="phone-container">
-        <div class="header-area">
-            <h1>AI相談アプリ～Hanaso～</h1>
+        <!-- ホームページ -->
+        <div id="page-home" class="page active">
+            <div class="header-area">
+                <h1>AI相談アプリ～Hanaso～</h1>
+            </div>
+            <div class="main-card">
+                <div class="logo">
+                    <img src="logo.png" alt="Hanaso Logo">
+                </div>
+                <div class="button-container">
+                    <button id="create-account" class="btn">アカウントを作成</button>
+                    <button id="login" class="btn btn-secondary">ログイン</button>
+                </div>
+            </div>
         </div>
 
-        <div class="main-card">
-            <div class="logo">
-                <img src="logo.png" alt="Hanaso Logo">
-            </div>
+        <!-- ログインページ -->
+        <div id="page-login" class="page">
+            <header>
+                <h1>AI相談アプリ～Hanaso～</h1>
+            </header>
+            <main>
+                <div class="card">
+                    <h3>ログイン</h3>
+                </div>
+                <br>
+                <div class="card">
+                    <p>メールアドレス</p>
+                    <input type="email" id="email" class="form-input" placeholder="example@mail.com" required>
+                </div>
+                <div class="card">
+                    <p>パスワード</p>
+                    <input type="password" id="password" class="form-input" placeholder="パスワードを入力" required>
+                </div>
+                <div>
+                    <button type="button" id="loginButton" class="login-btn">ログインする</button>
+                </div>
+                <div class="signup-link">
+                    <a href="#" id="signup-link">新しくアカウントを作成する</a>
+                </div>
+            </main>
+        </div>
 
-            <div class="button-container">
-                <button id="create-account" class="btn" onclick="location.href='account.html'">アカウントを作成</button>
-                <button id="login" class="btn btn-secondary" onclick="location.href='login.html'">ログイン</button>
+        <!-- アカウント作成ページ -->
+        <div id="page-account" class="page">
+            <div class="header-area">
+                <h1>AI相談アプリ～Hanaso～</h1>
+            </div>
+            <div class="main-card">
+                <div class="title-card">
+                    <h3>新しいアカウントを作成</h3>
+                </div>
+                <div class="form-card">
+                    <p>ユーザ名</p>
+                    <input type="text" class="form-input" placeholder="例：hanaso123" required>
+                </div>
+                <div class="form-card">
+                    <p>メールアドレス</p>
+                    <input type="email" class="form-input" placeholder="example@mail.com" required>
+                </div>
+                <div class="form-card">
+                    <p>パスワード</p>
+                    <input type="password" class="form-input" placeholder="8文字以上の英数字" required>
+                </div>
+                <div class="form-card">
+                    <p>あなたの興味・関心</p>
+                    <textarea class="form-input" rows="3" placeholder="例：旅行、料理、スポーツなど"></textarea>
+                </div>
+                <div class="footer-action">
+                    <button type="button" id="create-button" class="btn">作成する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- キャラクター選択ページ -->
+        <div id="page-select" class="page">
+            <div id="selection-page" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="header-area"><h1>誰に相談する？</h1></div>
+                <div class="main-card" id="scroll-grid" style="padding: 0;">
+                    <div class="selection-grid">
+                        <div class="char-item" data-name="くま" data-intro="ぼーっと空を眺めるのが日課だよ。たまに自分がクマなのかトリなのか分からなくなるけど、美味しい木の実があればそれで幸せ！">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">ゆっくり<br>聞くよ。</div></div>
+                            <div class="icon"><img src="png/kuma.PNG"></div>
+                            <div class="char-name-label">くま</div>
+                        </div>
+                        <div class="char-item" data-name="おじいさん" data-intro="盆栽を愛でて50年。若いもんには、まだまだ知恵で負けませんぞ。焦らんでええ、ゆっくり話そうな。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">焦らんで<br>ええぞ。</div></div>
+                            <div class="icon"><img src="png/oji.jpeg"></div>
+                            <div class="char-name-label">おじいさん</div>
+                        </div>
+                        <div class="char-item" data-name="おばあさん" data-intro="秘伝のタレで作る肉じゃがが自慢ですよ。ほころびも直してあげますから、一人で悩まないでね。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">一人で<br>悩まないで</div></div>
+                            <div class="icon"><img src="png/oba.jpg"></div>
+                            <div class="char-name-label">おばあさん</div>
+                        </div>
+                        <div class="char-item" data-name="先輩（男）" data-intro="仕事はスマートに、遊びは全力で、がモットーだ。君の力になりたいんだ。何でも言って。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">力に<br>なるよ。</div></div>
+                            <div class="icon"><img src="png/man.png"></div>
+                            <div class="char-name-label">先輩（男）</div>
+                        </div>
+                        <div class="char-item" data-name="先輩（女）" data-intro="毎日忙しいけど、お気に入りのカフェでリセット。たまには肩の力を抜いて、私とゆっくりお喋りしましょう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">本音、<br>聞かせて？</div></div>
+                            <div class="icon"><img src="png/woman.png"></div>
+                            <div class="char-name-label">先輩（女）</div>
+                        </div>
+                        <div class="char-item" data-name="ホスト" data-intro="孤独な夜はもう終わりだ。世界中で君一人だけを、最高のお姫様にしてあげる。さあ、僕の手を取って。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">君の<br>味方だよ。</div></div>
+                            <div class="icon"><img src="png/host.png"></div>
+                            <div class="char-name-label">ホスト</div>
+                        </div>
+                        <div class="char-item" data-name="INTJ（建築家）" data-intro="全ては計画通りです。無駄を省き、最も効率的な道筋を導き出しました。私と一緒に解決策を考えましょう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">解決策は<br>あります</div></div>
+                            <div class="icon"><img src="png/INTJ.png"></div>
+                            <div class="char-name-label">INTJ</div>
+                        </div>
+                        <div class="char-item" data-name="INTP（論理学者）" data-intro="興味深い理論ですね。その仕組みについて詳しく解析させてください。本質を突いた対話をしましょう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">本質を<br>探ろうか。</div></div>
+                            <div class="icon"><img src="png/INTP.png"></div>
+                            <div class="char-name-label">INTP</div>
+                        </div>
+                        <div class="char-item" data-name="ENTJ（指揮官）" data-intro="目標達成のための戦略は完璧だ。私についてくれば最高の結果を約束しよう。私が進むべき道を導こう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">私が<br>導こう。</div></div>
+                            <div class="icon"><img src="png/ENTJ.png"></div>
+                            <div class="char-name-label">ENTJ</div>
+                        </div>
+                        <div class="char-item" data-name="ENTP（討論者）" data-intro="それって本当に正しいのかな？別の視点から考えてみようよ。面白いアイデアならいくらでもあるぜ！">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">視点を<br>変えようぜ</div></div>
+                            <div class="icon"><img src="png/ENTP.png"></div>
+                            <div class="char-name-label">ENTP</div>
+                        </div>
+                        <div class="char-item" data-name="INFJ（提唱者）" data-intro="あなたの心の奥にある本当の願い、私には分かります。静かな場所で、理想の世界について語り合いましょう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">心の声を<br>聴かせて</div></div>
+                            <div class="icon"><img src="png/INFJ.png"></div>
+                            <div class="char-name-label">INFJ</div>
+                        </div>
+                        <div class="char-item" data-name="INFP（仲介者）" data-intro="夢や空想の中にいる時間が一番落ち着くんです。言葉にできないその想い、私と一緒に探してみませんか？">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">そのままで<br>いいよ</div></div>
+                            <div class="icon"><img src="png/INFP.png"></div>
+                            <div class="char-name-label">INFP</div>
+                        </div>
+                        <div class="char-item" data-name="ENFJ（主人公）" data-intro="みんなが笑顔になれる場所を作りたいんだ！君の悩みも全部聞かせて。最高の明日を迎えに行こう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">一緒に<br>考えよう！</div></div>
+                            <div class="icon"><img src="png/ENFJ.png"></div>
+                            <div class="char-name-label">ENFJ</div>
+                        </div>
+                        <div class="char-item" data-name="ENFP（運動家）" data-intro="ワクワクすることが止まらないよ！人生は一度きりの冒険だ。君の可能性、一緒に探そう！">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">可能性、<br>探そう！</div></div>
+                            <div class="icon"><img src="png/ENFP.png"></div>
+                            <div class="char-name-label">ENFP</div>
+                        </div>
+                        <div class="char-item" data-name="ISTJ（管理者）" data-intro="規律を重んじ、責任を全うすることが私の信条です。現実的な視点から誠実な歩みを約束します。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">現実的に<br>見よう。</div></div>
+                            <div class="icon"><img src="png/ISTJ.png"></div>
+                            <div class="char-name-label">ISTJ</div>
+                        </div>
+                        <div class="char-item" data-name="ISFJ（擁護者）" data-intro="いつも頑張っているあなたを、影ながら支えさせてください。困った時は温かいお茶を淹れて待っています。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">ずっと<br>支えます。</div></div>
+                            <div class="icon"><img src="png/ISFJ.png"></div>
+                            <div class="char-name-label">ISFJ</div>
+                        </div>
+                        <div class="char-item" data-name="ESTJ（幹部）" data-intro="社会のルールを守り、秩序を維持するのが私の役目だ。君の状況を整理し、管理してあげよう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">整理しま<br>しょう。</div></div>
+                            <div class="icon"><img src="png/ESTJ.png"></div>
+                            <div class="char-name-label">ESTJ</div>
+                        </div>
+                        <div class="char-item" data-name="ESFJ（領事官）" data-intro="みんなの輪を大切にするのが私の幸せなの。私に話してみて！何か手伝えることがあれば言ってね。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">私に<br>話してみて！</div></div>
+                            <div class="icon"><img src="png/host.png"></div>
+                            <div class="char-name-label">ESFJ</div>
+                        </div>
+                        <div class="char-item" data-name="ISTP（巨匠）" data-intro="理屈より実践だ。この道具さえあれば大抵のものは直せる。無駄を省き、自分のペースでやっていこう。">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">無駄は<br>省こう。</div></div>
+                            <div class="icon"><img src="png/ISTP.png"></div>
+                            <div class="char-name-label">ISTP</div>
+                        </div>
+                        <div class="char-item" data-name="ESTP（起業家）" data-intro="考える前に動け！スリルがなきゃ人生じゃないだろ。今この瞬間を最高に楽しもうぜ！悩むより動こう！">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">悩むより<br>動こう！</div></div>
+                            <div class="icon"><img src="png/ESTP.png"></div>
+                            <div class="char-name-label">ESTP</div>
+                        </div>
+                        <div class="char-item" data-name="ESFP（エンターテイナー）" data-intro="音楽とダンス！私がいればいつだってパーティーだよ。嫌なことなんて笑い飛ばそうぜ！">
+                            <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">笑い飛ば<br>そうぜ！</div></div>
+                            <div class="icon"><img src="png/ESFP.png"></div>
+                            <div class="char-name-label">ESFP</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-action">
+                    <button id="random-btn" class="btn" onclick="randomSelectAnimation()">ランダム選択</button>
+                </div>
+            </div>
+            <div id="profile-page" style="display: none; flex-direction: column; height: 100%;">
+                <div class="back-nav"><button class="back-btn" onclick="showSelection()">← 他のキャラを見る</button></div>
+                <div class="main-card profile-page-card">
+                    <div class="profile-icon-wrap">
+                        <img id="selected-icon" src="" alt="">
+                    </div>
+                    <div class="profile-content">
+                        <h2 id="profile-name"></h2>
+                        <p id="profile-intro" class="intro-text"></p>
+                    </div>
+                </div>
+                <div class="footer-action">
+                    <button class="btn" onclick="goToTalk()">君に決めた</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- トーク履歴ページ -->
+        <div id="page-talk" class="page">
+            <div class="header-area">
+                <h1>トーク</h1>
+            </div>
+            <div class="main-card">
+                <div class="talk-list" id="talk-list">
+                    <!-- トーク履歴がここに動的に追加されます -->
+                </div>
+            </div>
+        </div>
+
+        <!-- チャットページ -->
+        <div id="page-chat" class="page">
+            <div class="chat-page-container">
+                <div class="chat-header">
+                    <button class="back-button" onclick="goBackFromChat()">←</button>
+                    <div class="header-info">
+                        <div class="header-avatar">
+                            <img id="character-avatar" src="" alt="">
+                        </div>
+                        <div class="header-name" id="character-name"></div>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- メッセージがここに動的に追加されます -->
+                </div>
+                <div class="chat-input-area">
+                    <textarea 
+                        class="input-field" 
+                        id="message-input" 
+                        placeholder="メッセージを入力..."
+                        rows="1"
+                    ></textarea>
+                    <button class="send-button" id="send-button" onclick="sendMessage()">→</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // ページ遷移管理
+        function showPage(pageId) {
+            $('.page').removeClass('active');
+            $('#' + pageId).addClass('active');
+        }
+
+        // ホームページのイベント
+        $('#create-account').on('click', function() {
+            showPage('page-account');
+        });
+
+        $('#login').on('click', function() {
+            showPage('page-login');
+        });
+
+        // ログインページのイベント
+        $('#loginButton').on('click', function() {
+            const email = $('#email').val();
+            const password = $('#password').val();
+
+            if (email && password) {
+                alert("ログインに成功しました！");
+                showPage('page-talk');
+            } else {
+                alert("メールアドレスとパスワードを入力してください。");
+            }
+        });
+
+        $('#signup-link').on('click', function(e) {
+            e.preventDefault();
+            showPage('page-account');
+        });
+
+        // アカウント作成ページのイベント
+        $('#create-button').on('click', function() {
+            showPage('page-select');
+        });
+
+        // キャラクター選択ページの変数と関数
+        let selectedCharacterData = null;
+
+        function selectCharacter(element) {
+            const $element = $(element);
+            const imgSrc = $element.find('.icon img').attr('src');
+            const name = $element.attr('data-name');
+            const intro = $element.attr('data-intro');
+            
+            $('#selected-icon').attr('src', imgSrc);
+            $('#profile-name').text(name);
+            $('#profile-intro').text(intro);
+            selectedCharacterData = { imgSrc, name, intro };
+            
+            $('#selection-page').hide();
+            $('#profile-page').show();
+        }
+
+        function showSelection() {
+            $('#profile-page').hide();
+            $('#selection-page').show();
+        }
+
+        function goToTalk() {
+            if (selectedCharacterData) {
+                localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacterData));
+                showPage('page-talk');
+                // トーク履歴に追加
+                addTalkToHistory(selectedCharacterData);
+            }
+        }
+
+        function randomSelectAnimation() {
+            const characters = $('.char-item');
+            if (characters.length === 0) return;
+            $('#random-btn').prop('disabled', true);
+            let count = 0;
+            const totalSteps = 25;
+            let speed = 70;
+
+            const interval = setInterval(() => {
+                characters.removeClass('highlight');
+                const currentIndex = count % characters.length;
+                const activeItem = characters.eq(currentIndex);
+                activeItem.addClass('highlight');
+                
+                activeItem[0].scrollIntoView({ behavior: 'auto', block: 'center' });
+
+                count++;
+                if (count >= totalSteps) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        activeItem.removeClass('highlight');
+                        $('#random-btn').prop('disabled', false);
+                        selectCharacter(activeItem[0]);
+                    }, 400);
+                }
+            }, speed);
+        }
+
+        // キャラクター選択イベント
+        $(document).on('click', '.char-item', function() {
+            selectCharacter(this);
+        });
+
+        // トーク履歴管理
+        const characters = [
+            { name: "くま", img: "png/kuma.PNG" },
+            { name: "おじいさん", img: "png/oji.jpeg" },
+            { name: "おばあさん", img: "png/oba.jpg" },
+            { name: "先輩（男）", img: "png/man.png" },
+            { name: "先輩（女）", img: "png/woman.png" },
+            { name: "ホスト", img: "png/host.png" },
+            { name: "INTJ", img: "png/INTJ.png" },
+            { name: "INTP", img: "png/INTP.png" },
+            { name: "ENTJ", img: "png/ENTJ.png" },
+            { name: "ENTP", img: "png/ENTP.png" },
+            { name: "INFJ", img: "png/INFJ.png" },
+            { name: "INFP", img: "png/INFP.png" },
+            { name: "ENFJ", img: "png/ENFJ.png" },
+            { name: "ENFP", img: "png/ENFP.png" },
+            { name: "ISTJ", img: "png/ISTJ.png" },
+            { name: "ISFJ", img: "png/ISFJ.png" },
+            { name: "ESTJ", img: "png/ESTJ.png" },
+            { name: "ESFJ", img: "png/host.png" },
+            { name: "ISTP", img: "png/ISTP.png" },
+            { name: "ESTP", img: "png/ESTP.png" },
+            { name: "ESFP", img: "png/ESFP.png" }
+        ];
+
+        function getTalkHistory() {
+            const history = localStorage.getItem('talkHistory');
+            return history ? JSON.parse(history) : [];
+        }
+
+        function saveTalkHistory(history) {
+            localStorage.setItem('talkHistory', JSON.stringify(history));
+        }
+
+        function addTalkToHistory(characterData) {
+            const history = getTalkHistory();
+            const existingIndex = history.findIndex(talk => talk.name === characterData.name);
+            
+            let imgPath = characterData.imgSrc;
+            if (imgPath.includes('/')) {
+                imgPath = imgPath.split('/').pop();
+            }
+            
+            const talkData = {
+                name: characterData.name,
+                img: imgPath,
+                lastMessage: "相談を開始しました",
+                timestamp: new Date().toISOString(),
+                unread: existingIndex === -1 ? 1 : (history[existingIndex].unread || 0) + 1
+            };
+
+            if (existingIndex !== -1) {
+                const existingTalk = history[existingIndex];
+                existingTalk.lastMessage = talkData.lastMessage;
+                existingTalk.timestamp = talkData.timestamp;
+                existingTalk.unread = talkData.unread;
+                history.splice(existingIndex, 1);
+                history.unshift(existingTalk);
+            } else {
+                history.unshift(talkData);
+            }
+
+            saveTalkHistory(history);
+            renderTalkList();
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return "たった今";
+            if (minutes < 60) return `${minutes}分前`;
+            if (hours < 24) return `${hours}時間前`;
+            if (days < 7) return `${days}日前`;
+            return date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+        }
+
+        function renderTalkList() {
+            const talkList = $('#talk-list');
+            const history = getTalkHistory();
+
+            if (history.length === 0) {
+                talkList.html(`
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-text">まだトーク履歴がありません<br>キャラクターを選択して相談を始めましょう</div>
+                    </div>
+                `);
+                return;
+            }
+
+            talkList.html(history.map(talk => {
+                const unreadBadge = talk.unread > 0 ? `<span class="talk-badge">${talk.unread}</span>` : '';
+                return `
+                    <a href="#" class="talk-item" data-name="${talk.name}">
+                        <div class="talk-avatar">
+                            <img src="${talk.img}" alt="${talk.name}">
+                        </div>
+                        <div class="talk-content">
+                            <div class="talk-header">
+                                <span class="talk-name">${talk.name}</span>
+                                <div style="display: flex; align-items: center;">
+                                    <span class="talk-time">${formatTime(talk.timestamp)}</span>
+                                    ${unreadBadge}
+                                </div>
+                            </div>
+                            <div class="talk-preview">
+                                ${talk.lastMessage}
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join(''));
+
+            $('.talk-item').on('click', function(e) {
+                e.preventDefault();
+                const characterName = $(this).attr('data-name');
+                const history = getTalkHistory();
+                const talkData = history.find(talk => talk.name === characterName);
+                
+                if (talkData) {
+                    const characterData = {
+                        name: talkData.name,
+                        imgSrc: talkData.img,
+                        intro: ''
+                    };
+                    localStorage.setItem('currentChatCharacter', JSON.stringify(characterData));
+                    
+                    talkData.unread = 0;
+                    saveTalkHistory(history);
+                    
+                    showPage('page-chat');
+                    initChat();
+                }
+            });
+        }
+
+        // チャット機能
+        let currentCharacter = null;
+        let chatMessages = [];
+
+        function goBackFromChat() {
+            showPage('page-talk');
+            renderTalkList();
+        }
+
+        function initChat() {
+            const characterData = localStorage.getItem('currentChatCharacter');
+            if (characterData) {
+                currentCharacter = JSON.parse(characterData);
+                $('#character-name').text(currentCharacter.name);
+                $('#character-avatar').attr('src', currentCharacter.imgSrc);
+                loadChatHistory();
+            } else {
+                showPage('page-talk');
+            }
+        }
+
+        function loadChatHistory() {
+            const chatKey = `chat_${currentCharacter.name}`;
+            const savedMessages = localStorage.getItem(chatKey);
+            
+            if (savedMessages) {
+                chatMessages = JSON.parse(savedMessages);
+            } else {
+                chatMessages = [{
+                    type: 'character',
+                    text: 'こんにちは！相談したいことがあれば、何でも聞いてくださいね。',
+                    timestamp: new Date().toISOString()
+                }];
+                saveChatHistory();
+            }
+            
+            renderMessages();
+        }
+
+        function saveChatHistory() {
+            const chatKey = `chat_${currentCharacter.name}`;
+            localStorage.setItem(chatKey, JSON.stringify(chatMessages));
+            updateTalkHistory();
+        }
+
+        function updateTalkHistory() {
+            const talkHistory = JSON.parse(localStorage.getItem('talkHistory') || '[]');
+            const talkIndex = talkHistory.findIndex(talk => talk.name === currentCharacter.name);
+            
+            if (talkIndex !== -1) {
+                const lastMessage = chatMessages[chatMessages.length - 1];
+                talkHistory[talkIndex].lastMessage = lastMessage.text;
+                talkHistory[talkIndex].timestamp = lastMessage.timestamp;
+                localStorage.setItem('talkHistory', JSON.stringify(talkHistory));
+            }
+        }
+
+        function renderMessages() {
+            const messagesContainer = $('#chat-messages');
+            
+            if (chatMessages.length === 0) {
+                messagesContainer.html(`
+                    <div class="empty-chat">
+                        <div class="empty-chat-icon">💬</div>
+                        <div class="empty-chat-text">メッセージを送信して会話を始めましょう</div>
+                    </div>
+                `);
+                return;
+            }
+
+            messagesContainer.html(chatMessages.map((msg, index) => {
+                const isUser = msg.type === 'user';
+                const time = formatMessageTime(msg.timestamp);
+                
+                if (isUser) {
+                    return `
+                        <div class="message user">
+                            <div class="message-wrapper">
+                                <div class="message-content">${escapeHtml(msg.text)}</div>
+                                <div class="message-time">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="message character">
+                            <div class="character-avatar">
+                                <img src="${currentCharacter.imgSrc}" alt="${currentCharacter.name}">
+                            </div>
+                            <div class="message-wrapper">
+                                <div class="message-content">${escapeHtml(msg.text)}</div>
+                                <div class="message-time">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join(''));
+
+            scrollToBottom();
+        }
+
+        function formatMessageTime(timestamp) {
+            const date = new Date(timestamp);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sendMessage() {
+            const input = $('#message-input');
+            const sendButton = $('#send-button');
+            const text = input.val().trim();
+            
+            if (!text) return;
+
+            input.prop('disabled', true);
+            sendButton.prop('disabled', true);
+
+            chatMessages.push({
+                type: 'user',
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+
+            input.val('');
+            input.css('height', 'auto');
+            saveChatHistory();
+            renderMessages();
+
+            showLoadingIndicator();
+
+            $.ajax({
+                type: 'GET',
+                url: '/send',
+                data: { 
+                    q: text,
+                    character: currentCharacter.name
+                },
+                success: function(answer) {
+                    hideLoadingIndicator();
+                    
+                    chatMessages.push({
+                        type: 'character',
+                        text: answer,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    saveChatHistory();
+                    renderMessages();
+                    
+                    input.prop('disabled', false);
+                    sendButton.prop('disabled', false);
+                    input.focus();
+                },
+                error: function(xhr, status, error) {
+                    hideLoadingIndicator();
+                    
+                    chatMessages.push({
+                        type: 'character',
+                        text: '申し訳ございません。エラーが発生しました。もう一度お試しください。',
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    saveChatHistory();
+                    renderMessages();
+                    
+                    input.prop('disabled', false);
+                    sendButton.prop('disabled', false);
+                    input.focus();
+                    
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        function showLoadingIndicator() {
+            const messagesContainer = $('#chat-messages');
+            const loadingHtml = `
+                <div class="loading-indicator">
+                    <div class="character-avatar">
+                        <img src="${currentCharacter.imgSrc}" alt="${currentCharacter.name}">
+                    </div>
+                    <div class="loading-dots">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.append(loadingHtml);
+            scrollToBottom();
+        }
+
+        function hideLoadingIndicator() {
+            $('.loading-indicator').remove();
+        }
+
+        function handleKeyDown(event) {
+            const input = $('#message-input');
+            
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+            
+            input.css('height', 'auto');
+            input.css('height', input[0].scrollHeight + 'px');
+        }
+
+        $('#message-input').on('keydown', handleKeyDown);
+
+        function scrollToBottom() {
+            const messagesContainer = $('#chat-messages');
+            messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
+        }
+
+        // ページ読み込み時の処理
+        $(document).ready(function() {
+            // 選択されたキャラクター情報を確認
+            const selectedCharacter = localStorage.getItem('selectedCharacter');
+            if (selectedCharacter) {
+                const characterData = JSON.parse(selectedCharacter);
+                addTalkToHistory(characterData);
+                localStorage.removeItem('selectedCharacter');
+            } else {
+                renderTalkList();
+            }
+
+            // チャットページが表示されている場合、初期化
+            if ($('#page-chat').hasClass('active')) {
+                initChat();
+            }
+        });
+    </script>
 
 </body>
 </html>
