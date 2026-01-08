@@ -1,17 +1,21 @@
-﻿# webブラウザで、https://IPアドレス:8000/send?q=こんにちは　にアクセス
+# webブラウザで、https://IPアドレス:8000/send?q=こんにちは　にアクセス
 
-# Windowsのコマンドプロンプトで set GOOGLE_API_KEY=自分のAPIキーを実行しておく
+# Windowsのコマンドプロンプトで set OPENAI_API_KEY=自分のAPIキーを実行しておく
 
 ###########################################################
-## 以下、Geminiを使うための前処理          ################
+## 以下、ChatGPTを使うための前処理         ################
 ###########################################################
 
-import google.generativeai as genai
+from openai import OpenAI
 import os
 
-GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY') #または、GOOGLE_API_KEY="自分のAPIキー"
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-2.5-flash')#gemini-2.0-flash
+
+# OpenAI APIキーを設定。環境変数から取得します。
+# 事前に `set OPENAI_API_KEY=sk-xxxx...` のように設定してください。
+api_key = os.getenv('OPENAI_API_KEY')
+if not api_key:
+    raise ValueError("OpenAI APIキーが設定されていません。環境変数 'OPENAI_API_KEY' を設定してください。")
+client = OpenAI(api_key=api_key)
 
 ###########################################################
 ## 以下、Webサーバーとして動かすための処理 ################
@@ -42,8 +46,11 @@ class MyHandler(SimpleHTTPRequestHandler):
             
             #answer="<b>"+q+"</b>"+"ですか？" 
             
-            response=model.generate_content(q) #geminiに質問して回答を得る
-            answer = "<b>" + response.text + "</b>" #webブラウザに返信するHTML文を作成する
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": q}]
+            )
+            answer = "<b>" + response.choices[0].message.content + "</b>" #webブラウザに返信するHTML文を作成する
             print(answer) #consoleに表示
             
             self.wfile.write(answer.encode('utf-8'))#webブラウザに返信する
