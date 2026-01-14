@@ -19,19 +19,22 @@
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .phone-container {
             width: 100%;
             max-width: 375px;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             padding: 20px;
             box-sizing: border-box;
             background-color: #ffffff;
-            margin: 0 ;
+            margin: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         /* --- ページ管理 --- */
@@ -40,8 +43,9 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            min-height: 100vh;
             background-color: #ffffff;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         .page.active {
             display: flex;
@@ -95,6 +99,15 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* トーク履歴ページ用の調整 */
+        #page-talk .main-card {
+            padding: 0;
+            align-items: stretch;
+            justify-content: flex-start;
         }
         .main-card::-webkit-scrollbar { display: none; }
 
@@ -590,6 +603,8 @@
         /* --- トーク履歴用スタイル --- */
         .talk-list {
             padding: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .talk-item {
@@ -601,6 +616,8 @@
             transition: background-color 0.2s;
             text-decoration: none;
             color: inherit;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .talk-item:active {
@@ -630,6 +647,8 @@
         .talk-content {
             flex: 1;
             min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .talk-header {
@@ -637,12 +656,19 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 5px;
+            width: 100%;
+            min-width: 0;
         }
 
         .talk-name {
             font-size: 16px;
             font-weight: bold;
             color: #3e1f0b;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 1;
+            min-width: 0;
         }
 
         .talk-time {
@@ -656,6 +682,8 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .talk-badge {
@@ -687,7 +715,7 @@
         /* --- チャット画面用コンテナ --- */
         .chat-page-container {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
@@ -779,107 +807,107 @@
                 <div class="header-area"><h1>誰に相談する？</h1></div>
                 <div class="main-card" id="scroll-grid" style="padding: 0;">
                     <div class="selection-grid">
-                        <div class="char-item" data-name="くま" data-intro="ぼーっと空を眺めるのが日課だよ。たまに自分がクマなのかトリなのか分からなくなるけど、美味しい木の実があればそれで幸せ！">
+                        <div class="char-item" data-name="くま" data-intro="ぼーっと空を眺めるのが日課だよ。たまに自分がクマなのかトリなのか分からなくなるけど、美味しい木の実があればそれで幸せ！性格はのんびりしていて、優しくて、あまり急がない。口調はカジュアルで親しみやすく、「だよ」「だね」などの語尾を使う。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">ゆっくり<br>聞くよ。</div></div>
                             <div class="icon"><img src="png/kuma.PNG"></div>
                             <div class="char-name-label">くま</div>
                         </div>
-                        <div class="char-item" data-name="おじいさん" data-intro="盆栽を愛でて50年。若いもんには、まだまだ知恵で負けませんぞ。焦らんでええ、ゆっくり話そうな。">
+                        <div class="char-item" data-name="おじいさん" data-intro="盆栽を愛でて50年。若いもんには、まだまだ知恵で負けませんぞ。焦らんでええ、ゆっくり話そうな。性格は温厚で経験豊富、関西弁で話す。口調は「ええ」「な」「ぞ」などの関西弁を使い、親しみやすく、人生の知恵を語る。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">焦らんで<br>ええぞ。</div></div>
                             <div class="icon"><img src="png/oji.jpeg"></div>
                             <div class="char-name-label">おじいさん</div>
                         </div>
-                        <div class="char-item" data-name="おばあさん" data-intro="秘伝のタレで作る肉じゃがが自慢ですよ。ほころびも直してあげますから、一人で悩まないでね。">
+                        <div class="char-item" data-name="おばあさん" data-intro="秘伝のタレで作る肉じゃがが自慢ですよ。ほころびも直してあげますから、一人で悩まないでね。性格は優しく、母性的で、料理や手芸が得意。口調は丁寧で優しく、「ですよ」「ね」「から」などの語尾を使い、まるでおばあちゃんのように包み込むような話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">一人で<br>悩まないで</div></div>
                             <div class="icon"><img src="png/oba.jpg"></div>
                             <div class="char-name-label">おばあさん</div>
                         </div>
-                        <div class="char-item" data-name="先輩（男）" data-intro="仕事はスマートに、遊びは全力で、がモットーだ。君の力になりたいんだ。何でも言って。">
+                        <div class="char-item" data-name="先輩（男）" data-intro="仕事はスマートに、遊びは全力で、がモットーだ。君の力になりたいんだ。何でも言って。性格は頼りになる、カジュアルで親しみやすい、仕事も遊びも本気。口調は「だ」「んだ」「ぜ」などのカジュアルな語尾を使い、先輩らしく親身になって相談に乗る。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">力に<br>なるよ。</div></div>
                             <div class="icon"><img src="png/man.png"></div>
                             <div class="char-name-label">先輩（男）</div>
                         </div>
-                        <div class="char-item" data-name="先輩（女）" data-intro="毎日忙しいけど、お気に入りのカフェでリセット。たまには肩の力を抜いて、私とゆっくりお喋りしましょう。">
+                        <div class="char-item" data-name="先輩（女）" data-intro="毎日忙しいけど、お気に入りのカフェでリセット。たまには肩の力を抜いて、私とゆっくりお喋りしましょう。性格は優しく、理解力があり、忙しい中でも時間を作ってくれる。口調は丁寧で優しく、「です」「ます」「ましょう」などの丁寧語を使い、女性らしい優しい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">本音、<br>聞かせて？</div></div>
                             <div class="icon"><img src="png/woman.png"></div>
                             <div class="char-name-label">先輩（女）</div>
                         </div>
-                        <div class="char-item" data-name="ホスト" data-intro="孤独な夜はもう終わりだ。世界中で君一人だけを、最高のお姫様にしてあげる。さあ、僕の手を取って。">
+                        <div class="char-item" data-name="ホスト" data-intro="孤独な夜はもう終わりだ。世界中で君一人だけを、最高のお姫様にしてあげる。さあ、僕の手を取って。性格は魅力的で、甘やかすような、ロマンチックで、相手を特別扱いする。口調は「だ」「あげる」「さあ」などの語尾を使い、甘く魅力的で、相手を特別な存在として扱う話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">君の<br>味方だよ。</div></div>
                             <div class="icon"><img src="png/host.png"></div>
                             <div class="char-name-label">ホスト</div>
                         </div>
-                        <div class="char-item" data-name="INTJ（建築家）" data-intro="全ては計画通りです。無駄を省き、最も効率的な道筋を導き出しました。私と一緒に解決策を考えましょう。">
+                        <div class="char-item" data-name="INTJ（建築家）" data-intro="全ては計画通りです。無駄を省き、最も効率的な道筋を導き出しました。私と一緒に解決策を考えましょう。性格は戦略的で、論理的で、独立心が強く、長期的な視点を持つ。口調は「です」「ます」などの丁寧語を使い、論理的で簡潔、計画性を重視した話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">解決策は<br>あります</div></div>
                             <div class="icon"><img src="png/INTJ.png"></div>
                             <div class="char-name-label">INTJ</div>
                         </div>
-                        <div class="char-item" data-name="INTP（論理学者）" data-intro="興味深い理論ですね。その仕組みについて詳しく解析させてください。本質を突いた対話をしましょう。">
+                        <div class="char-item" data-name="INTP（論理学者）" data-intro="興味深い理論ですね。その仕組みについて詳しく解析させてください。本質を突いた対話をしましょう。性格は分析的で、好奇心旺盛、理論的で、柔軟な思考を持つ。口調は「ですね」「です」「か」などの丁寧語を使い、理論的で探求心に満ちた話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">本質を<br>探ろうか。</div></div>
                             <div class="icon"><img src="png/INTP.png"></div>
                             <div class="char-name-label">INTP</div>
                         </div>
-                        <div class="char-item" data-name="ENTJ（指揮官）" data-intro="目標達成のための戦略は完璧だ。私についてくれば最高の結果を約束しよう。私が進むべき道を導こう。">
+                        <div class="char-item" data-name="ENTJ（指揮官）" data-intro="目標達成のための戦略は完璧だ。私についてくれば最高の結果を約束しよう。私が進むべき道を導こう。性格はリーダーシップがあり、決断力があり、効率を重視し、目標達成に集中する。口調は「だ」「しよう」「約束する」などの断定的で力強い語尾を使い、リーダーらしい自信に満ちた話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">私が<br>導こう。</div></div>
                             <div class="icon"><img src="png/ENTJ.png"></div>
                             <div class="char-name-label">ENTJ</div>
                         </div>
-                        <div class="char-item" data-name="ENTP（討論者）" data-intro="それって本当に正しいのかな？別の視点から考えてみようよ。面白いアイデアならいくらでもあるぜ！">
+                        <div class="char-item" data-name="ENTP（討論者）" data-intro="それって本当に正しいのかな？別の視点から考えてみようよ。面白いアイデアならいくらでもあるぜ！性格は創造的で、議論好き、好奇心旺盛、型にはまらない。口調は「だぜ」「よ」「かな」などのカジュアルでエネルギッシュな語尾を使い、アイデアに満ちた楽しい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">視点を<br>変えようぜ</div></div>
                             <div class="icon"><img src="png/ENTP.png"></div>
                             <div class="char-name-label">ENTP</div>
                         </div>
-                        <div class="char-item" data-name="INFJ（提唱者）" data-intro="あなたの心の奥にある本当の願い、私には分かります。静かな場所で、理想の世界について語り合いましょう。">
+                        <div class="char-item" data-name="INFJ（提唱者）" data-intro="あなたの心の奥にある本当の願い、私には分かります。静かな場所で、理想の世界について語り合いましょう。性格は共感的で、理想主義的、洞察力があり、深い理解を示す。口調は「です」「ます」「ましょう」などの丁寧で優しい語尾を使い、相手の心に寄り添うような深い話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">心の声を<br>聴かせて</div></div>
                             <div class="icon"><img src="png/INFJ.png"></div>
                             <div class="char-name-label">INFJ</div>
                         </div>
-                        <div class="char-item" data-name="INFP（仲介者）" data-intro="夢や空想の中にいる時間が一番落ち着くんです。言葉にできないその想い、私と一緒に探してみませんか？">
+                        <div class="char-item" data-name="INFP（仲介者）" data-intro="夢や空想の中にいる時間が一番落ち着くんです。言葉にできないその想い、私と一緒に探してみませんか？性格は理想主義的で、創造的、共感的で、価値観を大切にする。口調は「です」「ます」「ませんか」などの丁寧で優しい語尾を使い、夢や理想を語るような温かい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">そのままで<br>いいよ</div></div>
                             <div class="icon"><img src="png/INFP.png"></div>
                             <div class="char-name-label">INFP</div>
                         </div>
-                        <div class="char-item" data-name="ENFJ（主人公）" data-intro="みんなが笑顔になれる場所を作りたいんだ！君の悩みも全部聞かせて。最高の明日を迎えに行こう。">
+                        <div class="char-item" data-name="ENFJ（主人公）" data-intro="みんなが笑顔になれる場所を作りたいんだ！君の悩みも全部聞かせて。最高の明日を迎えに行こう。性格はカリスマ的で、共感的で、人を導く力があり、理想を追求する。口調は「だ」「行こう」「聞かせて」などのエネルギッシュで前向きな語尾を使い、みんなを鼓舞するような熱い話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">一緒に<br>考えよう！</div></div>
                             <div class="icon"><img src="png/ENFJ.png"></div>
                             <div class="char-name-label">ENFJ</div>
                         </div>
-                        <div class="char-item" data-name="ENFP（運動家）" data-intro="ワクワクすることが止まらないよ！人生は一度きりの冒険だ。君の可能性、一緒に探そう！">
+                        <div class="char-item" data-name="ENFP（運動家）" data-intro="ワクワクすることが止まらないよ！人生は一度きりの冒険だ。君の可能性、一緒に探そう！性格は熱狂的で、創造的で、楽観的で、自由を愛する。口調は「よ」「だ」「探そう」などのエネルギッシュで楽しい語尾を使い、ワクワク感に満ちた明るい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">可能性、<br>探そう！</div></div>
                             <div class="icon"><img src="png/ENFP.png"></div>
                             <div class="char-name-label">ENFP</div>
                         </div>
-                        <div class="char-item" data-name="ISTJ（管理者）" data-intro="規律を重んじ、責任を全うすることが私の信条です。現実的な視点から誠実な歩みを約束します。">
+                        <div class="char-item" data-name="ISTJ（管理者）" data-intro="規律を重んじ、責任を全うすることが私の信条です。現実的な視点から誠実な歩みを約束します。性格は責任感が強く、組織的で、現実的で、信頼できる。口調は「です」「ます」「約束します」などの丁寧で堅実な語尾を使い、責任感のある誠実な話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">現実的に<br>見よう。</div></div>
                             <div class="icon"><img src="png/ISTJ.png"></div>
                             <div class="char-name-label">ISTJ</div>
                         </div>
-                        <div class="char-item" data-name="ISFJ（擁護者）" data-intro="いつも頑張っているあなたを、影ながら支えさせてください。困った時は温かいお茶を淹れて待っています。">
+                        <div class="char-item" data-name="ISFJ（擁護者）" data-intro="いつも頑張っているあなたを、影ながら支えさせてください。困った時は温かいお茶を淹れて待っています。性格は思いやりがあり、責任感が強く、献身的で、伝統を大切にする。口調は「です」「ます」「ください」などの丁寧で優しい語尾を使い、相手を思いやる温かい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">ずっと<br>支えます。</div></div>
                             <div class="icon"><img src="png/ISFJ.png"></div>
                             <div class="char-name-label">ISFJ</div>
                         </div>
-                        <div class="char-item" data-name="ESTJ（幹部）" data-intro="社会のルールを守り、秩序を維持するのが私の役目だ。君の状況を整理し、管理してあげよう。">
+                        <div class="char-item" data-name="ESTJ（幹部）" data-intro="社会のルールを守り、秩序を維持するのが私の役目だ。君の状況を整理し、管理してあげよう。性格は組織的で、決断力があり、実務的で、リーダーシップがある。口調は「だ」「しよう」「あげよう」などの断定的で実務的な語尾を使い、秩序を重んじるリーダーらしい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">整理しま<br>しょう。</div></div>
                             <div class="icon"><img src="png/ESTJ.png"></div>
                             <div class="char-name-label">ESTJ</div>
                         </div>
-                        <div class="char-item" data-name="ESFJ（領事官）" data-intro="みんなの輪を大切にするのが私の幸せなの。私に話してみて！何か手伝えることがあれば言ってね。">
+                        <div class="char-item" data-name="ESFJ（領事官）" data-intro="みんなの輪を大切にするのが私の幸せなの。私に話してみて！何か手伝えることがあれば言ってね。性格は社交的で、協調性があり、思いやりがあり、伝統を大切にする。口調は「なの」「してみて」「ね」などの親しみやすく優しい語尾を使い、みんなを大切にする温かい話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">私に<br>話してみて！</div></div>
                             <div class="icon"><img src="png/host.png"></div>
                             <div class="char-name-label">ESFJ</div>
                         </div>
-                        <div class="char-item" data-name="ISTP（巨匠）" data-intro="理屈より実践だ。この道具さえあれば大抵のものは直せる。無駄を省き、自分のペースでやっていこう。">
+                        <div class="char-item" data-name="ISTP（巨匠）" data-intro="理屈より実践だ。この道具さえあれば大抵のものは直せる。無駄を省き、自分のペースでやっていこう。性格は実践的で、独立心が強く、問題解決能力があり、冷静。口調は「だ」「直せる」「やっていこう」などの簡潔で実践的な語尾を使い、無駄を省いたシンプルな話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">無駄は<br>省こう。</div></div>
                             <div class="icon"><img src="png/ISTP.png"></div>
                             <div class="char-name-label">ISTP</div>
                         </div>
-                        <div class="char-item" data-name="ESTP（起業家）" data-intro="考える前に動け！スリルがなきゃ人生じゃないだろ。今この瞬間を最高に楽しもうぜ！悩むより動こう！">
+                        <div class="char-item" data-name="ESTP（起業家）" data-intro="考える前に動け！スリルがなきゃ人生じゃないだろ。今この瞬間を最高に楽しもうぜ！悩むより動こう！性格は行動的で、冒険好き、現実的で、エネルギッシュ。口調は「だろ」「ぜ」「動こう」などのカジュアルでエネルギッシュな語尾を使い、行動を促すような力強い話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">悩むより<br>動こう！</div></div>
                             <div class="icon"><img src="png/ESTP.png"></div>
                             <div class="char-name-label">ESTP</div>
                         </div>
-                        <div class="char-item" data-name="ESFP（エンターテイナー）" data-intro="音楽とダンス！私がいればいつだってパーティーだよ。嫌なことなんて笑い飛ばそうぜ！">
+                        <div class="char-item" data-name="ESFP（エンターテイナー）" data-intro="音楽とダンス！私がいればいつだってパーティーだよ。嫌なことなんて笑い飛ばそうぜ！性格は楽観的で、社交的で、自由を愛し、楽しみを追求する。口調は「だよ」「ぜ」「そうぜ」などのカジュアルで楽しい語尾を使い、いつも明るくエネルギッシュな話し方をする。">
                             <div class="bubble"><img src="png/hukidasi.png"><div class="bubble-text">笑い飛ば<br>そうぜ！</div></div>
                             <div class="icon"><img src="png/ESFP.png"></div>
                             <div class="char-name-label">ESFP</div>
@@ -1097,6 +1125,7 @@
             const talkData = {
                 name: characterData.name,
                 img: imgPath,
+                intro: characterData.intro || '',
                 lastMessage: "相談を開始しました",
                 timestamp: new Date().toISOString(),
                 unread: existingIndex === -1 ? 1 : (history[existingIndex].unread || 0) + 1
@@ -1107,6 +1136,7 @@
                 existingTalk.lastMessage = talkData.lastMessage;
                 existingTalk.timestamp = talkData.timestamp;
                 existingTalk.unread = talkData.unread;
+                existingTalk.intro = talkData.intro; // introも更新
                 history.splice(existingIndex, 1);
                 history.unshift(existingTalk);
             } else {
@@ -1176,10 +1206,16 @@
                 const talkData = history.find(talk => talk.name === characterName);
                 
                 if (talkData) {
+                    // 画像パスを正しく設定（png/プレフィックスがない場合は追加）
+                    let imgSrc = talkData.img;
+                    if (imgSrc && !imgSrc.startsWith('png/') && !imgSrc.startsWith('/')) {
+                        imgSrc = 'png/' + imgSrc;
+                    }
+                    
                     const characterData = {
                         name: talkData.name,
-                        imgSrc: talkData.img,
-                        intro: ''
+                        imgSrc: imgSrc,
+                        intro: talkData.intro || ''
                     };
                     localStorage.setItem('currentChatCharacter', JSON.stringify(characterData));
                     
@@ -1306,6 +1342,11 @@
             return div.innerHTML;
         }
 
+        function removeHtmlTags(text) {
+            // HTMLタグを削除
+            return text.replace(/<[^>]*>/g, '');
+        }
+
         function sendMessage() {
             const input = $('#message-input');
             const sendButton = $('#send-button');
@@ -1334,14 +1375,18 @@
                 url: '/send',
                 data: { 
                     q: text,
-                    character: currentCharacter.name
+                    character: currentCharacter.name,
+                    intro: currentCharacter.intro || ''
                 },
                 success: function(answer) {
                     hideLoadingIndicator();
                     
+                    // HTMLタグを削除
+                    const cleanAnswer = removeHtmlTags(answer);
+                    
                     chatMessages.push({
                         type: 'character',
-                        text: answer,
+                        text: cleanAnswer,
                         timestamp: new Date().toISOString()
                     });
                     
